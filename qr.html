@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>QRコード読み取り（HTML4）</title>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
+<script type="text/javascript">
+function readQR(input) {
+  var file = input.files[0];
+  if (!file) return;
+
+  var reader = new FileReader();
+  reader.onload = function() {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.getElementById("canvas");
+      var ctx = canvas.getContext("2d");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      var code = jsQR(imageData.data, canvas.width, canvas.height);
+
+      if (code) {
+        document.getElementById("result").innerHTML =
+          "読み取り結果:<br><b>" + code.data + "</b>";
+      } else {
+        document.getElementById("result").innerHTML =
+          "QRコードを検出できませんでした";
+      }
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+</head>
+
+<body>
+<h2>QRコード読み取り（HTML4対応）</h2>
+
+<input type="file" accept="image/*" onchange="readQR(this)">
+<br><br>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<div id="result">ここに結果が表示されます</div>
+
+</body>
+</html>
